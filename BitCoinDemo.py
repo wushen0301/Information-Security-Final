@@ -57,6 +57,13 @@ class BlockchainSimulator:
         self.log_area.see(tk.END)   #自動顯示到最下方
         self.root.update() 
 
+    #更新previous hash用
+    def update_prev_hash_ui(self, new_val):
+        self.entry_prev_hash.config(state='normal')   # 暫時開啟編輯權限
+        self.entry_prev_hash.delete(0, tk.END)         # 清除舊的雜湊值
+        self.entry_prev_hash.insert(0, new_val)        # 插入剛挖出的新雜湊值
+        self.entry_prev_hash.config(state='readonly') # 恢復為唯讀狀態
+
     #挖礦作業
     def mine_process(self):
         self.btn_mine.config(state=tk.DISABLED)
@@ -92,6 +99,8 @@ class BlockchainSimulator:
                 self.log(f"- Hash: {new_hash}")
                 self.log(f"- 總次數: {attempts} 次")
                 self.log(f"- 花費時間: {elapsed_time:.4f} 秒")
+                self.log(f"\n[System] 下一區塊的 Previous Hash 已更新。")
+                self.update_prev_hash_ui(new_hash)
                 self.log("-" * 50)
                 break
             
