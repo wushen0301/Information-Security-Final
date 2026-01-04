@@ -37,7 +37,7 @@ class BlockchainSimulator:
         self.entry_tx.grid(row=1, column=1, pady=5)
 
         #難度設定(滑條設定輸出結果左邊要幾個0)
-        tk.Label(input_frame, text="Difficulty (Num of 0s):").grid(row=2, column=0, sticky="w")
+        tk.Label(input_frame, text="Difficulty (Num of 0s in hex):").grid(row=2, column=0, sticky="w")
         self.diff_var = tk.IntVar(value=4)
         tk.Scale(input_frame, from_=1, to=10, orient=tk.HORIZONTAL, variable=self.diff_var).grid(row=2, column=1, sticky="w")
 
@@ -66,7 +66,7 @@ class BlockchainSimulator:
         prefix = '0' * difficulty
         
         self.log(f"\n[開始挖掘新區塊]")
-        self.log(f"目標難度: 左邊有 {difficulty} 個零")
+        self.log(f"目標難度: 16進位下左邊有 {difficulty} 個零(bits部分有 {difficulty * 4} 個零)")
         self.log(f"區塊內容: {transactions}")
         
         nonce = random.randint(0, 1000000000)   #起始nonce
@@ -108,6 +108,5 @@ def main():
     root = tk.Tk()
     app = BlockchainSimulator(root)
     root.mainloop()
-
 
 main()
