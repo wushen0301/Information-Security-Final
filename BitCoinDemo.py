@@ -13,9 +13,9 @@ class BlockchainSimulator:
         #預設一個Previous Hash
         self.prev_hash_val = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
         
-        self.create_widgets()
+        self.create_window()
 
-    def create_widgets(self):
+    def create_window(self):
         #標題
         tk.Label(self.root, text="BitCoin POW (Proof-of-Work) 模擬", font=("Arial", 16, "bold")).pack(pady=10)
 
@@ -108,5 +108,6 @@ def main():
     root = tk.Tk()
     app = BlockchainSimulator(root)
     root.mainloop()
+
 
 main()
