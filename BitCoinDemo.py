@@ -25,15 +25,15 @@ class BlockchainSimulator:
 
         #顯示Previous Hash
         tk.Label(input_frame, text="Previous Hash:").grid(row=0, column=0, sticky="w")
-        self.entry_prev_hash = tk.Entry(input_frame, width=70)
+        self.entry_prev_hash = tk.Entry(input_frame, width=75)
         self.entry_prev_hash.insert(0, self.prev_hash_val)
         self.entry_prev_hash.config(state='readonly')
         self.entry_prev_hash.grid(row=0, column=1, pady=5)
 
         #交易內容輸入部分
         tk.Label(input_frame, text="Transactions:").grid(row=1, column=0, sticky="w")
-        self.entry_tx = tk.Entry(input_frame, width=70)
-        self.entry_tx.insert(0, "Alice pays Bob 10 BTC;")
+        self.entry_tx = tk.Entry(input_frame, width=75)
+        self.entry_tx.insert(0, "Alice pays Bob: 10 BTC;")
         self.entry_tx.grid(row=1, column=1, pady=5)
 
         #難度設定(滑條設定輸出結果左邊要幾個0)
@@ -64,37 +64,44 @@ class BlockchainSimulator:
         self.entry_prev_hash.insert(0, new_val)        # 插入剛挖出的新雜湊值
         self.entry_prev_hash.config(state='readonly') # 恢復為唯讀狀態
 
+    #模擬比特幣的Double SHA-256運算
+    def bitcoin_hash(self, data):
+        first_hash = hashlib.sha256(data.encode()).digest()
+        second_hash = hashlib.sha256(first_hash).hexdigest()
+        return second_hash
+
     #挖礦作業
     def mine_process(self):
         self.btn_mine.config(state=tk.DISABLED)
         prev_hash = self.entry_prev_hash.get()
-        transactions = self.entry_tx.get()
+        raw_tx = self.entry_tx.get()
         difficulty = self.diff_var.get()
         prefix = '0' * difficulty
         
+        merkle_root = hashlib.sha256(raw_tx.encode()).hexdigest()
+        
         self.log(f"\n[開始挖掘新區塊]")
+        self.log(f"模擬 Merkle Root: {merkle_root}")
         self.log(f"目標難度: 16進位下左邊有 {difficulty} 個零(bits部分有 {difficulty * 4} 個零)")
-        self.log(f"區塊內容: {transactions}")
         
         nonce = random.randint(0, 1000000000)   #起始nonce
         attempts = 1    #計算次數
         start_time = time.time()
         
         while True:
-            #串連(PrevHash + Transactions + Nonce)
-            content = f"{prev_hash}{transactions}{nonce}"
-
-            #做SHA-256
-            new_hash = hashlib.sha256(content.encode()).hexdigest()
+            #模擬Block Header (Prev Hash + Merkle Root + Timestamp + Nonce)
+            timestamp = int(time.time())
+            block_header = f"{prev_hash}{merkle_root}{timestamp}{nonce}"
             
+            #double sha-256
+            new_hash = self.bitcoin_hash(block_header)
+
             #成功找到符合的
             if new_hash.startswith(prefix):
-
-                end_time = time.time()
-                elapsed_time = end_time - start_time
+                elapsed_time = time.time() - start_time
                 
                 self.log("-" * 50)
-                self.log(f"成功找到符合條件的Nonce!")
+                self.log(f"成功挖掘新區塊!")
                 self.log(f"- Nonce: {nonce}")
                 self.log(f"- Hash: {new_hash}")
                 self.log(f"- 總次數: {attempts} 次")
